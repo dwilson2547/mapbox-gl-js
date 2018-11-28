@@ -54,6 +54,15 @@ export default function validateSource(options) {
             style,
             styleSpec
         });
+    
+    case 'videocontrols':
+        return validateObject({
+            key,
+            value,
+            valueSpec: styleSpec.source_videocontrols,
+            style,
+            styleSpec
+        });
 
     case 'image':
         return validateObject({
@@ -72,7 +81,7 @@ export default function validateSource(options) {
         return validateEnum({
             key: `${key}.type`,
             value: value.type,
-            valueSpec: {values: ['vector', 'raster', 'raster-dem', 'geojson', 'video', 'image']},
+            valueSpec: {values: ['vector', 'raster', 'raster-dem', 'geojson', 'video', 'videocontrols', 'image']},
             style,
             styleSpec
         });
