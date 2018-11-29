@@ -86,7 +86,6 @@ class VideoControlsSource extends ImageSource {
 
                 this.video.addEventListener('seeked', () => {
                     this.videoSeeked = true;
-                    console.log('seeked');
                     this.map.triggerRepaint();
                 })
 
@@ -106,10 +105,6 @@ class VideoControlsSource extends ImageSource {
      */
     getVideo() {
         return this.video;
-    }
-
-    logShit() {
-        console.log("it's real fam");
     }
 
     onAdd(map: Map) {
@@ -194,8 +189,12 @@ class VideoControlsSource extends ImageSource {
     }
 
     hasTransition() {
-        return true;
-        //this.video && (!this.video.paused || !this.videoSeeked);
+        var result = this.video && (!this.video.paused || this.videoSeeked);
+        if (this.videoSeeked) {
+            this.videoSeeked = false;
+        }
+        return result;
+
     }
 }
 
