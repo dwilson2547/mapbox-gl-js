@@ -50,6 +50,7 @@ class VideoControlsSource extends ImageSource {
     urls: Array<string>;
     video: HTMLVideoElement;
     roundZoom: boolean;
+    videoSeeked: boolean;
 
     /**
      * @private
@@ -57,8 +58,9 @@ class VideoControlsSource extends ImageSource {
     constructor(id: string, options: VideoSourceSpecification, dispatcher: Dispatcher, eventedParent: Evented) {
         super(id, options, dispatcher, eventedParent);
         this.roundZoom = true;
-        this.type = 'video';
+        this.type = 'videocontrols';
         this.options = options;
+        this.videoSeeked = false;
     }
 
     load() {
@@ -81,6 +83,12 @@ class VideoControlsSource extends ImageSource {
                 this.video.addEventListener('playing', () => {
                     this.map.triggerRepaint();
                 });
+
+                this.video.addEventListener('seeked', () => {
+                    this.videoSeeked = true;
+                    console.log('seeked');
+                    this.map.triggerRepaint();
+                })
 
                 if (this.map) {
                     this.video.play();
@@ -112,6 +120,22 @@ class VideoControlsSource extends ImageSource {
             this.video.play();
             this.setCoordinates(this.coordinates);
         }
+    }
+
+    getCurrentTime() {
+        return this.video.currentTime;
+    }
+
+    setCurrentTime(time: number) {
+        this.video.currentTime = time;
+    }
+
+    play() {
+        this.video.play();
+    }
+
+    pause() {
+        this.video.pause();
     }
 
     /**
@@ -147,7 +171,7 @@ class VideoControlsSource extends ImageSource {
         if (!this.texture) {
             this.texture = new Texture(context, this.video, gl.RGBA);
             this.texture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE);
-        } else if (!this.video.paused) {
+        } else if (!this.video.paused || this.videoSeeked) {
             this.texture.bind(gl.LINEAR, gl.CLAMP_TO_EDGE);
             gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.video);
         }
@@ -170,7 +194,8 @@ class VideoControlsSource extends ImageSource {
     }
 
     hasTransition() {
-        return this.video && !this.video.paused;
+        return true;
+        //this.video && (!this.video.paused || !this.videoSeeked);
     }
 }
 
